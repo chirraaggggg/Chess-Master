@@ -1,8 +1,10 @@
 const express = require("express");
+app.use(express.json());
 const socket = require("socket.io");
 const http = require("http");
 const path = require("path");
 const { Chess } = require("chess.js");
+app.use('/auth', require('./routes/auth'));
 
 const app = express();
 const server = http.createServer(app);
