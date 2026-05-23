@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chess Master — Login</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0d0d0f;
+      color: #e8e6e1;
+      font-family: sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      background: #16161a;
+      border: 1px solid #2a2a32;
+      border-radius: 12px;
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+    }
+    h1 {
+      font-size: 1.4rem;
+      color: #c9a84c;
+      margin-bottom: 8px;
+      text-align: center;
+      letter-spacing: 0.1em;
+    }
+    p {
+      text-align: center;
+      color: #6b6b7a;
+      font-size: 0.85rem;
+      margin-bottom: 28px;
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: #6b6b7a;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    input {
+      width: 100%;
+      padding: 10px 14px;
+      background: #0d0d0f;
+      border: 1px solid #2a2a32;
+      border-radius: 6px;
+      color: #e8e6e1;
+      font-size: 0.95rem;
+      margin-bottom: 18px;
+      outline: none;
+    }
+    input:focus { border-color: #c9a84c; }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #c9a84c;
+      color: #0d0d0f;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+    button:hover { background: #b8973b; }
+    .switch {
+      text-align: center;
+      font-size: 0.83rem;
+      color: #6b6b7a;
+    }
+    .switch a { color: #c9a84c; text-decoration: none; }
+    #error {
+      color: #e53e3e;
+      font-size: 0.83rem;
+      text-align: center;
+      margin-bottom: 12px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>CHESS MASTER</h1>
+    <p>Sign in to play</p>
+    <div id="error"></div>
+    <label>Email</label>
+    <input type="email" id="email" placeholder="you@example.com" />
+    <label>Password</label>
+    <input type="password" id="password" placeholder="••••••••" />
+    <button onclick="login()">Sign In</button>
+    <div class="switch">
+      No account? <a href="/register">Register</a>
+    </div>
+  </div>
+
+  <script>
+    async function login() {
+      const email = document.getElementById('email').value
+      const password = document.getElementById('password').value
+      const errorEl = document.getElementById('error')
+
+      try {
+        const res = await fetch('/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        })
+        const data = await res.json()
+
+        if (!res.ok) {
+          errorEl.textContent = data.error || 'Login failed'
+          errorEl.style.display = 'block'
+          return
+        }
+
+        // save token and redirect to game
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('username', data.user.username)
+        window.location.href = '/'
+
+      } catch (err) {
+        errorEl.textContent = 'Server error. Try again.'
+        errorEl.style.display = 'block'
+      }
+    }
+
+    // allow pressing Enter to login
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') login()
+    })
+  </script>
+</body>
+</html>
